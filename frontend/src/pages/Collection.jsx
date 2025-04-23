@@ -5,12 +5,12 @@ import { assets } from "../assets/assets.js";
 import Title from "../components/Title.jsx";
 
 const Collection = () => {
-  const { products,search,showSearch } = useContext(ShopContext);
+  const { products, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
-  const [sortType, setSortType] = useState("relevent");
-  const [filterProducts, setFilterProducts] = useState(products);
+  const [sortType, setSortType] = useState("relevant");
+  const [filterProducts, setFilterProducts] = useState([]);
 
   const handleCheckboxChange = (category) => {
     setSelectedCategories((prev) =>
@@ -26,6 +26,30 @@ const Collection = () => {
         ? prev.filter((cat) => cat !== subCat)
         : [...prev, subCat]
     );
+  };
+
+  const applyFilter = (products) => {
+    let filtered = [...products];
+
+    if (search && showSearch) {
+      filtered = filtered.filter((product) =>
+        product.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedCategories.includes(product.category)
+      );
+    }
+
+    if (subCategory.length > 0) {
+      filtered = filtered.filter((product) =>
+        subCategory.includes(product.subCategory)
+      );
+    }
+
+    return filtered;
   };
 
   const sortProduct = (productList) => {
@@ -47,19 +71,11 @@ const Collection = () => {
 
   useEffect(() => {
     if (Array.isArray(products)) {
-      const filtered = products.filter((product) => {
-        const categoryMatch =
-          selectedCategories.length === 0 ||
-          selectedCategories.includes(product.category);
-        const subCategoryMatch =
-          subCategory.length === 0 || subCategory.includes(product.subCategory);
-        return categoryMatch && subCategoryMatch;
-      });
-
-      const sortedFiltered = sortProduct(filtered);
-      setFilterProducts(sortedFiltered);
+      let filtered = applyFilter(products);
+      let sorted = sortProduct(filtered);
+      setFilterProducts(sorted);
     }
-  }, [products, selectedCategories, subCategory, sortType]);
+  }, [products, selectedCategories, subCategory, sortType, search, showSearch]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
@@ -76,7 +92,8 @@ const Collection = () => {
             }`}
           />
         </p>
-        <div
+
+         <div
           className={`border border-gray-300 pl-5 py-3 mt-6 ${
             showFilter ? "" : "hidden"
           }`}
@@ -98,7 +115,7 @@ const Collection = () => {
           </div>
         </div>
 
-        <div
+         <div
           className={`border border-gray-300 pl-5 py-3 mt-6 ${
             showFilter ? "" : "hidden"
           }`}
@@ -121,6 +138,7 @@ const Collection = () => {
         </div>
       </div>
 
+
       <div className="flex-1">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={"ALL"} text2={"COLLECTIONS"} />
@@ -129,7 +147,7 @@ const Collection = () => {
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
           >
-            <option value="relevent">Sort by: Relevent</option>
+            <option value="relevant">Sort by: Relevant</option>
             <option value="low-high">Sort by: Low - High</option>
             <option value="high-low">Sort by: High - Low</option>
           </select>

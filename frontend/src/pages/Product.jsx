@@ -84,12 +84,6 @@ const Product = () => {
           >
             ADD TO CART
           </button>
-          <Link
-            to="/cart"
-            className="text-xl text-gray-500 hover:text-gray-800 transition"
-          >
-            Cart
-          </Link>
           <hr className="mt-12 sm:w-4/5 mb-8" />
           <div className="text-md text-gray-500 pt-4 leading-sm">
             <p>100% Original product.</p>
